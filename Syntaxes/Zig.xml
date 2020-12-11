@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<syntax name="mylang">
+    <meta>
+        <name>Zig</name>
+        <type>compiled</type>
+        <preferred-file-extension>zig</preferred-file-extension>
+    </meta>
+    
+    <detectors>
+        <extension priority="1.0">zig</extension>
+    </detectors>
+    
+    <indentation>
+        <increase>
+            <expression>(\{[^}\"']*$)|(\[[^\]\"']*$)|(\([^)\"']*$)</expression>
+        </increase>
+        <decrease>
+            <expression>^\s*(\s*/\*.*\*/\s*)*[\}\]\)\\]</expression>
+        </decrease>
+    </indentation>
+    
+    <comments>
+        <single>
+            <expression>//</expression>
+        </single>
+    </comments>
+    
+    <brackets>
+        <pair open="{" close="}" />
+        <pair open="[" close="]" />
+        <pair open="(" close=")" />
+    </brackets>
+    
+    <surrounding-pairs>
+        <pair open="{" close="}" />
+        <pair open="[" close="]" />
+        <pair open="(" close=")" />
+        <pair open="&apos;" close="&apos;" />
+        <pair open="&quot;" close="&quot;" />
+    </surrounding-pairs>
+    
+    <scopes>
+        <!-- Ordering here defines scope matching precedence -->
+        <include syntax="self" collection="comments" />
+        <include syntax="self" collection="blocks" />
+        <include syntax="self" collection="definitions" />
+        <include syntax="self" collection="keywords" />
+        <include syntax="self" collection="values" />
+        <include syntax="self" collection="identifiers" />
+        <include syntax="self" collection="syntax" />
+    </scopes>
+    
+    <collections>
+        <collection name="comments">
+            <scope name="zig.comment.single" spell-check="true">
+                <expression>//(?:/|!)?(.*)$</expression>
+                <capture number="1" name="zig.comment.content" />            
+            </scope>
+        </collection>
+        
+        <collection name="blocks">
+            <scope name="zig.block">
+                <symbol type="block">
+                    <context behavior="subtree" />
+                </symbol>
+                <starts-with>
+                    <expression>\{</expression>
+                    <capture number="0" name="zig.block.bracket" />
+                </starts-with>
+                <ends-with>
+                    <expression>\}</expression>
+                    <capture number="0" name="zig.block.bracket" />
+                </ends-with>
+                <subscopes>
+                    <include syntax="self" />
+                </subscopes>
+            </scope>
+        </collection>
+        
+        <collection name="keywords">
+            <scope name="zig.keyword">
+                <symbol type="keyword" />
+                <strings>
+                    <string>align</string>
+                    <string>allowzero</string>
+                    <string>anyframe</string>
+                    <string>anytype</string>
+                    <string>asm</string>
+                    <string>async</string>
+                    <string>await</string>
+                    <string>break</string>
+                    <string>catch</string>
+                    <string>comptime</string>
+                    <string>const</string>
+                    <string>continue</string>
+                    <string>defer</string>
+                    <string>else</string>
+                    <string>enum</string>
+                    <string>errdefer</string>
+                    <string>error</string>
+                    <string>export</string>
+                    <string>extern</string>
+                    <string>fn</string>
+                    <string>for</string>
+                    <string>if</string>
+                    <string>inline</string>
+                    <string>noalias</string>
+                    <string>nosuspend</string>
+                    <string>or</string>
+                    <string>orelse</string>
+                    <string>packed</string>
+                    <string>pub</string>
+                    <string>resume</string>
+                    <string>return</string>
+                    <string>linksection</string>
+                    <string>struct</string>
+                    <string>suspend</string>
+                    <string>switch</string>
+                    <string>test</string>
+                    <string>threadlocal</string>
+                    <string>try</string>
+                    <string>union</string>
+                    <string>unreachable</string>
+                    <string>usingnamespace</string>
+                    <string>var</string>
+                    <string>volatile</string>
+                    <string>while</string>
+                </strings>
+            </scope>
+            
+            <scope name="zig.identifier.type.primitive">
+                <strings>
+                    <string>i8</string>
+                    <string>u8</string>
+                    <string>i16</string>
+                    <string>u16</string>
+                    <string>i32</string>
+                    <string>u32</string>
+                    <string>i64</string>
+                    <string>u64</string>
+                    <string>i128</string>
+                    <string>u128</string>
+                    <string>isize</string>
+                    <string>usize</string>
+                    <string>c_short</string>
+                    <string>c_ushort</string>
+                    <string>c_int</string>
+                    <string>c_uint</string>
+                    <string>c_long</string>
+                    <string>c_ulong</string>
+                    <string>c_longlong</string>
+                    <string>c_ulonglong</string>
+                    <string>c_longdouble</string>
+                    <string>c_void</string>
+                    <string>f16</string>
+                    <string>f32</string>
+                    <string>f64</string>
+                    <string>f128</string>
+                    <string>bool</string>
+                    <string>void</string>
+                    <string>noreturn</string>
+                    <string>type</string>
+                    <string>anyerror</string>
+                    <string>comptime_int</string>
+                    <string>comptime_float</string>
+                </strings>
+            </scope>
+        </collection>
+        
+        <collection name="values">
+            <scope name="zig.value.boolean">
+                <strings>
+                    <string>true</string>
+                    <string>false</string>
+                </strings>
+            </scope>
+            
+            <scope name="zig.value.null">
+                <strings>
+                    <string>null</string>
+                    <string>undefined</string>
+                </strings>
+            </scope>
+            
+            <scope name="zig.value.string">
+                <starts-with>
+                    <expression>&quot;</expression>
+                </starts-with>
+                <ends-with>
+                    <expression>&quot;</expression>
+                </ends-with>
+            </scope>
+            
+            <scope name="zig.value.string.character">
+                <starts-with>
+                    <expression>&apos;</expression>
+                </starts-with>
+                <ends-with>
+                    <expression>&apos;</expression>
+                </ends-with>
+            </scope>
+            
+            <scope name="zig.value.string.multiline">
+                <expression>^\s*\\\\</expression>
+            </scope>
+            
+            <scope name="zig.value.number.float.dec">
+                <expression>\b-?[0-9]([0-9_]*[0-9])?\.[0-9]([0-9_]*[0-9])?([eE][-+]?[0-9]+)?\b</expression>
+            </scope>
+            <scope name="zig.value.number.float.hex">
+                <expression>\b-?0x[0-9a-fA-F]([0-9a-fA-F_]*[0-9a-fA-F])?.[0-9a-fA-F]([0-9a-fA-F_]*[0-9a-fA-F])?([pP][-+]?[0-9a-fA-F]+)?\b</expression>
+            </scope>
+
+            <scope name="zig.value.number.integer.dec">
+                <expression>\b-?[0-9]([0-9_]*[0-9])?\b</expression>
+            </scope>
+            <scope name="zig.value.number.integer.hex">
+                <expression>\b-?0x[0-9a-fA-F]([0-9a-fA-F_]*[0-9a-fA-F])?\b</expression>
+            </scope>
+            <scope name="zig.value.number.integer.oct">
+                <expression>\b-?0o[0-7]([0-7_]*[0-7])?\b</expression>
+            </scope>
+            <scope name="zig.value.number.integer.bin">
+                <expression>\b-?0b[0-1]([0-1_]*[0-1])?\b</expression>
+            </scope>
+        </collection>
+        
+        <collection name="identifiers">
+            <scope name="zig.identifier">
+                <expression>\b[a-zA-Z_][\w_]*\b</expression>
+            </scope>
+        </collection>
+        
+        <collection name="definitions">
+            <scope name="zig.definition.constant">
+                <symbol type="constant" scope="local" />
+                <starts-with>
+                    <expression>\b(const)\s+([a-zA-Z_][\w_]*)\b</expression>
+                    <capture number="1" name="zig.keyword.const" />
+                    <capture number="2" name="zig.identifier.constant.name" />
+                </starts-with>
+                <ends-with>
+                    <expression>\=|\;</expression>
+                </ends-with>
+                <subscopes>
+                    <cutoff>
+                        <expression>(?=\b(?:struct|fn|switch|while|for|if|else)\b)</expression>
+                    </cutoff>
+                    <include syntax="self" collection="value-type" />
+                </subscopes>
+            </scope>
+            
+            <scope name="zig.definition.variable">
+                <symbol type="variable" scope="local" />
+                <starts-with>
+                    <expression>\b(var)\s+([a-zA-Z_][\w_]*)\b</expression>
+                    <capture number="1" name="zig.keyword.var" />
+                    <capture number="2" name="zig.identifier.variable.name" />
+                </starts-with>
+                <ends-with>
+                    <expression>\=|\;</expression>
+                </ends-with>
+                <subscopes>
+                    <cutoff>
+                        <expression>(?=\b(?:struct|fn|switch|while|for|if|else)\b)</expression>
+                    </cutoff>
+                    <include syntax="self" collection="value-type" />
+                </subscopes>
+            </scope>
+            
+            <scope name="zig.definition.function">
+                <symbol type="function">
+                    <context behavior="subtree" foldable="false" />
+                </symbol>
+                <starts-with>
+                    <expression>(?:\b(?:(pub)\s+)?\b(fn))\s+([a-zA-Z_][a-zA-Z0-9_]*)</expression>
+                    <capture number="1" name="zig.keyword.pub" />
+                    <capture number="2" name="zig.keyword.fn" />
+                    <capture number="3" name="zig.identifier.function.name" />
+                </starts-with>
+                <ends-with>
+                    <expression>(?&lt;=\})</expression>
+                </ends-with>
+                <subscopes>
+                    <cutoff>
+                        <expression>(?=\b(?:fn|switch|while|for|if|else)\b)</expression>
+                    </cutoff>
+                    <include syntax="self" collection="comments" />
+                    <include syntax="self" collection="arguments" />
+                    <include syntax="self" collection="function-blocks" />
+                    <scope name="zig.function.return-type">
+                        <starts-with>
+                            <expression>(?&lt;=\))</expression>
+                            <capture number="1" name="zig.operator" />
+                        </starts-with>
+                        <ends-with>
+                            <expression>(?=\{)</expression>
+                        </ends-with>
+                        <subscopes>
+                            <cutoff>
+                                <expression>(?=\b(?:struct|fn|switch|while|for|if|else)\b)</expression>
+                            </cutoff>
+                            <include syntax="self" collection="comments" />
+                            <include syntax="self" collection="types" />
+                        </subscopes>
+                    </scope>
+                </subscopes>
+            </scope>
+        </collection>
+        
+        <collection name="value-type">
+            <scope name="zig.value.type">
+                <starts-with>
+                    <expression>\:</expression>
+                    <capture number="0" name="zig.operator" />
+                </starts-with>
+                <ends-with>
+                    <expression>(?=\=|\;)</expression>
+                </ends-with>
+                <subscopes>
+                    <cutoff>
+                        <expression>(?=\b(?:struct|fn|switch|while|for|if|else)\b)</expression>
+                    </cutoff>
+                    <include syntax="self" collection="comments" />
+                    <include syntax="self" collection="types" />
+                </subscopes>
+            </scope>
+        </collection>
+        
+        <collection name="arguments">
+            <scope name="zig.arguments">
+                <include syntax="self" collection="comments" />
+                <starts-with>
+                    <expression>\(</expression>
+                    <capture number="0" name="zig.bracket" />
+                </starts-with>
+                <ends-with>
+                    <expression>\)</expression>
+                    <capture number="0" name="zig.bracket" />
+                </ends-with>
+                <subscopes>
+                    <cutoff>
+                        <expression>(?=\b(?:struct|fn|switch|while|for|if|else)\b)</expression>
+                    </cutoff>
+                    <include syntax="self" collection="comments" />
+                    
+                    <scope name="zig.separator">
+                        <expression>,</expression>
+                    </scope>
+                    <scope name="zig.identifier.argument.glob">
+                        <symbol type="argument" />
+                        <expression>\.\.\.\b</expression>
+                        <capture number="0" name="zig.operator" />
+                    </scope>
+                    <scope name="zig.argument">
+                        <symbol type="argument" />
+                        <starts-with>
+                            <expression>(?:(noalias|comptime)\s+)?\b([a-zA-Z_][\w_]*)\s*(:)</expression>
+                            <capture number="1" name="zig.keyword" />
+                            <capture number="2" name="zig.identifier.argument.name" />
+                            <capture number="3" name="zig.operator" />
+                        </starts-with>
+                        <ends-with>
+                            <expression>(?=\)|\,)</expression>
+                        </ends-with>
+                        <subscopes>
+                            <cutoff>
+                                <expression>(?=\b(?:struct|fn|switch|while|for|if|else)\b)</expression>
+                            </cutoff>
+                            <include syntax="self" collection="comments" />
+                            <include syntax="self" collection="types" />
+                        </subscopes>
+                    </scope>
+                </subscopes>
+            </scope>
+        </collection>
+        
+        <collection name="function-blocks">
+            <scope name="zig.block">
+                <symbol type="block">
+                    <context behavior="subtree" fold-type="function" />
+                </symbol>
+                <starts-with>
+                    <expression>\{</expression>
+                    <capture number="0" name="zig.bracket" />
+                </starts-with>
+                <ends-with>
+                    <expression>\}</expression>
+                    <capture number="0" name="zig.bracket" />
+                </ends-with>
+                <subscopes>
+                    <include syntax="self" />
+                </subscopes>
+            </scope>
+        </collection>
+        
+        <collection name="types">
+            <scope name="zig.identifier.type.prefix">
+                <!-- TODO?: Support expressions in an array declaration -->
+                <expression>\?|anyframe\s*\-&gt;|\[\d*\s*(:\s*\d+)?\]|(\*|\*\*|\[\*(c|:\w+)?\])</expression>
+            </scope>
+            <!-- TODO?: Use Zig's grammar. Currently doesn't seem to be worth the trouble. -->
+            <scope name="zig.identifier.type.expr">
+                <expression>(\w|\.|_)+(\!(\w|\.|_)+)?</expression>
+            </scope>
+        </collection>
+        
+        <collection name="syntax">
+            <!-- Based off of the Javascript/Typescript syntaxes; I don't understand the interaction between this and the blocks collection -->
+            <scope name="zig.bracket.block.start">
+                <symbol type="block">
+                    <context behavior="start" />
+                </symbol>
+                <expression>\{</expression>
+            </scope>
+            <scope name="zig.bracket.block.end">
+                <symbol type="block">
+                    <context behavior="end" />
+                </symbol>
+                <expression>\}</expression>
+            </scope>
+            <scope name="zig.bracket">
+                <expression>[\(\[\]\)]</expression>
+            </scope>
+            <scope name="zig.operator">
+                <expression>\+|\+\=|\+\%|\+\%\=|</expression>
+            </scope>
+            <scope name="zig.comma">
+                <expression>,</expression>
+            </scope>
+            <scope name="zig.semicolon">
+                <expression>;</expression>
+            </scope>
+        </collection>
+        
+    </collections>
+</syntax>

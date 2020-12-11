@@ -1,0 +1,8 @@
+{
+    "identifier": "org.zig",
+    "name": "Zig",
+    "organization": "MyOrganization",
+    "description": "Support for the Zig language",
+    "version": "1.0",
+    "categories": ["languages"]
+}
