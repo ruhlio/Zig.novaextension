@@ -232,42 +232,6 @@
         </collection>
         
         <collection name="definitions">
-            <scope name="zig.definition.constant">
-                <symbol type="constant" scope="local" />
-                <starts-with>
-                    <expression>\b(const)\s+([a-zA-Z_][\w_]*)\b</expression>
-                    <capture number="1" name="zig.keyword.const" />
-                    <capture number="2" name="zig.identifier.constant.name" />
-                </starts-with>
-                <ends-with>
-                    <expression>\=|\;</expression>
-                </ends-with>
-                <subscopes>
-                    <cutoff>
-                        <expression>(?=\b(?:struct|fn|switch|while|for|if|else)\b)</expression>
-                    </cutoff>
-                    <include syntax="self" collection="value-type" />
-                </subscopes>
-            </scope>
-            
-            <scope name="zig.definition.variable">
-                <symbol type="variable" scope="local" />
-                <starts-with>
-                    <expression>\b(var)\s+([a-zA-Z_][\w_]*)\b</expression>
-                    <capture number="1" name="zig.keyword.var" />
-                    <capture number="2" name="zig.identifier.variable.name" />
-                </starts-with>
-                <ends-with>
-                    <expression>\=|\;</expression>
-                </ends-with>
-                <subscopes>
-                    <cutoff>
-                        <expression>(?=\b(?:struct|fn|switch|while|for|if|else)\b)</expression>
-                    </cutoff>
-                    <include syntax="self" collection="value-type" />
-                </subscopes>
-            </scope>
-            
             <scope name="zig.definition.function">
                 <symbol type="function">
                     <context behavior="subtree" foldable="false" />
@@ -298,12 +262,51 @@
                         </ends-with>
                         <subscopes>
                             <cutoff>
-                                <expression>(?=\b(?:struct|fn|switch|while|for|if|else)\b)</expression>
+                                <expression>(?=\b(?:struct|enum|union|opaque|fn|switch|while|for|if|else)\b)</expression>
                             </cutoff>
                             <include syntax="self" collection="comments" />
                             <include syntax="self" collection="types" />
                         </subscopes>
                     </scope>
+                </subscopes>
+            </scope>
+
+            <include syntax="self" collection="containers" />
+            
+            <!-- Needs to be below struct scope to prevent overriding -->
+            <scope name="zig.definition.constant">
+                <symbol type="constant" scope="local" />
+                <starts-with>
+                    <expression>\b(const)\s+([a-zA-Z_][\w_]*)\b</expression>
+                    <capture number="1" name="zig.keyword.const" />
+                    <capture number="2" name="zig.identifier.constant.name" />
+                </starts-with>
+                <ends-with>
+                    <expression>\=|\;</expression>
+                </ends-with>
+                <subscopes>
+                    <cutoff>
+                        <expression>(?=\b(?:struct|enum|union|opaque|fn|switch|while|for|if|else)\b)</expression>
+                    </cutoff>
+                    <include syntax="self" collection="value-type" />
+                </subscopes>
+            </scope>
+            
+            <scope name="zig.definition.variable">
+                <symbol type="variable" scope="local" />
+                <starts-with>
+                    <expression>\b(var)\s+([a-zA-Z_][\w_]*)\b</expression>
+                    <capture number="1" name="zig.keyword.var" />
+                    <capture number="2" name="zig.identifier.variable.name" />
+                </starts-with>
+                <ends-with>
+                    <expression>\=|\;</expression>
+                </ends-with>
+                <subscopes>
+                    <cutoff>
+                        <expression>(?=\b(?:struct|enum|union|opaque|fn|switch|while|for|if|else)\b)</expression>
+                    </cutoff>
+                    <include syntax="self" collection="value-type" />
                 </subscopes>
             </scope>
         </collection>
@@ -319,7 +322,7 @@
                 </ends-with>
                 <subscopes>
                     <cutoff>
-                        <expression>(?=\b(?:struct|fn|switch|while|for|if|else)\b)</expression>
+                        <expression>(?=\b(?:struct|enum|union|opaque|fn|switch|while|for|if|else)\b)</expression>
                     </cutoff>
                     <include syntax="self" collection="comments" />
                     <include syntax="self" collection="types" />
@@ -340,7 +343,7 @@
                 </ends-with>
                 <subscopes>
                     <cutoff>
-                        <expression>(?=\b(?:struct|fn|switch|while|for|if|else)\b)</expression>
+                        <expression>(?=\b(?:struct|enum|union|opaque|fn|switch|while|for|if|else)\b)</expression>
                     </cutoff>
                     <include syntax="self" collection="comments" />
                     
@@ -365,7 +368,7 @@
                         </ends-with>
                         <subscopes>
                             <cutoff>
-                                <expression>(?=\b(?:struct|fn|switch|while|for|if|else)\b)</expression>
+                                <expression>(?=\b(?:struct|enum|union|opaque|fn|switch|while|for|if|else)\b)</expression>
                             </cutoff>
                             <include syntax="self" collection="comments" />
                             <include syntax="self" collection="types" />
@@ -390,6 +393,151 @@
                 </ends-with>
                 <subscopes>
                     <include syntax="self" />
+                </subscopes>
+            </scope>
+        </collection>
+        
+        <collection name="containers">
+            <scope name="zig.definition.struct">
+                <symbol type="struct">
+                    <context behavior="subtree" foldable="false" />
+                </symbol>
+                <starts-with>
+                    <expression>(?:\b(pub)\s+)?\b(const)\s+([a-zA-Z_][\w_]*)\s*(\=)\s*(?:(extern|packed)\s+)?(struct)</expression>
+                    <capture number="1" name="zig.keyword" />
+                    <capture number="2" name="zig.keyword" />
+                    <capture number="3" name="zig.identifier.type.struct.name" />
+                    <capture number="4" name="zig.operator" />
+                    <capture number="5" name="zig.keyword" />
+                    <capture number="6" name="zig.keyword" />
+                </starts-with>
+                <ends-with>
+                    <expression>(?&lt;=\})</expression>
+                </ends-with>
+                <subscopes>
+                    <cutoff>
+                        <expression>(?=\b(?:struct|enum|union|opaque|fn|switch|while|for|if|else)\b)</expression>
+                    </cutoff>
+                    <scope name="zig.block">
+                        <symbol type="block">
+                            <context behavior="subtree" fold-type="struct" />
+                        </symbol>
+                        <starts-with>
+                            <expression>\{</expression>
+                            <capture number="0" name="zig.bracket" />
+                        </starts-with>
+                        <ends-with>
+                            <expression>(\})</expression>
+                            <capture number="1" name="zig.bracket" />
+                        </ends-with>
+                        <subscopes>
+                            <include syntax="self" collection="comments" />
+                            <include syntax="self" collection="properties" />
+                            <include syntax="self" collection="methods" />
+                            <include syntax="self" collection="containers" />
+                        </subscopes>
+                    </scope>
+                </subscopes>
+            </scope>
+            
+            <scope name="zig.definition.struct.anonymous">
+                <symbol type="struct" anonymous="true">
+                    <context behavior="subtree" foldable="false" />
+                </symbol>
+                <starts-with>
+                    <expression>(?:\b(extern|packed)\s+)?\b(struct)</expression>
+                    <capture number="5" name="zig.keyword" />
+                    <capture number="6" name="zig.keyword" />
+                </starts-with>
+                <ends-with>
+                    <expression>(?&lt;=\})</expression>
+                </ends-with>
+                <subscopes>
+                    <cutoff>
+                        <expression>(?=\b(?:struct|enum|union|opaque|fn|switch|while|for|if|else)\b)</expression>
+                    </cutoff>
+                    <scope name="zig.block">
+                        <symbol type="block">
+                            <context behavior="subtree" fold-type="struct" />
+                        </symbol>
+                        <starts-with>
+                            <expression>\{</expression>
+                            <capture number="0" name="zig.bracket" />
+                        </starts-with>
+                        <ends-with>
+                            <expression>(\})</expression>
+                            <capture number="1" name="zig.bracket" />
+                        </ends-with>
+                        <subscopes>
+                            <include syntax="self" collection="comments" />
+                            <include syntax="self" collection="properties" />
+                            <include syntax="self" collection="methods" />
+                            <include syntax="self" collection="containers" />
+                        </subscopes>
+                    </scope>
+                </subscopes>
+            </scope>
+        </collection>
+        
+        <collection name="properties">
+            <scope name="zig.definition.property">
+                <symbol type="property" scope="private" />
+                <starts-with>
+                    <expression>\b(?:(comptime)\s+)?([a-zA-Z_][\w_]*)(?=\:)</expression>
+                    <capture number="1" name="zig.keyword" />
+                    <capture number="2" name="zig.identifier.property.name" />
+                </starts-with>
+                <ends-with>
+                    <expression>,</expression>
+                    <capture number="0" name="zig.operator" />
+                </ends-with>
+                <subscopes>
+                    <cutoff>
+                        <expression>(?=\b(?:struct|enum|union|opaque|fn|switch|while|for|if|else)\b)</expression>
+                    </cutoff>
+                    <include syntax="self" collection="comments" />
+                    <include syntax="self" collection="types" />
+                </subscopes>
+            </scope>
+        </collection>
+        
+        <collection name="methods">
+            <scope name="zig.definition.method">
+                <symbol type="method">
+                    <context behavior="subtree" foldable="false" />
+                </symbol>
+                <starts-with>
+                    <expression>(?:\b(?:(pub)\s+)?\b(fn))\s+([a-zA-Z_][a-zA-Z0-9_]*)</expression>
+                    <capture number="1" name="zig.keyword.pub" />
+                    <capture number="2" name="zig.keyword.fn" />
+                    <capture number="3" name="zig.identifier.method.name" />
+                </starts-with>
+                <ends-with>
+                    <expression>(?&lt;=\})</expression>
+                </ends-with>
+                <subscopes>
+                    <cutoff>
+                        <expression>(?=\b(?:fn|switch|while|for|if|else)\b)</expression>
+                    </cutoff>
+                    <include syntax="self" collection="comments" />
+                    <include syntax="self" collection="arguments" />
+                    <include syntax="self" collection="function-blocks" />
+                    <scope name="zig.method.return-type">
+                        <starts-with>
+                            <expression>(?&lt;=\))</expression>
+                            <capture number="1" name="zig.operator" />
+                        </starts-with>
+                        <ends-with>
+                            <expression>(?=\{)</expression>
+                        </ends-with>
+                        <subscopes>
+                            <cutoff>
+                                <expression>(?=\b(?:struct|enum|union|opaque|fn|switch|while|for|if|else)\b)</expression>
+                            </cutoff>
+                            <include syntax="self" collection="comments" />
+                            <include syntax="self" collection="types" />
+                        </subscopes>
+                    </scope>
                 </subscopes>
             </scope>
         </collection>
