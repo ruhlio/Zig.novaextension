@@ -521,7 +521,52 @@
                         </subscopes>
                     </scope>
                 </subscopes>
-            </scope>    
+            </scope>
+            
+            <scope name="zig.definition.union">
+                <symbol type="enum">
+                    <context behavior="subtree" foldable="false" />
+                </symbol>
+                <starts-with>
+                    <expression>(?:\b(pub)\s+)?\b(const)\s+([a-zA-Z_][\w_]*)\s*(\=)\s*(?:(extern|packed)\s+)?(union)(?:\s*(\()\s*([a-zA-Z_][\w_]*)\s*(\)))?</expression>
+                    <capture number="1" name="zig.keyword" />
+                    <capture number="2" name="zig.keyword" />
+                    <capture number="3" name="zig.identifier.type.union.name" />
+                    <capture number="4" name="zig.operator" />
+                    <capture number="5" name="zig.keyword" />
+                    <capture number="6" name="zig.keyword" />
+                    <capture number="7" name="zig.bracket" />
+                    <capture number="8" name="zig.identifier.type.enum" />
+                    <capture number="9" name="zig.bracket" />
+                </starts-with>
+                <ends-with>
+                    <expression>(?&lt;=\})</expression>
+                </ends-with>
+                <subscopes>
+                    <cutoff>
+                        <expression>(?=\b(?:struct|enum|union|opaque|fn|switch|while|for|if|else)\b)</expression>
+                    </cutoff>
+                    <scope name="zig.block">
+                        <symbol type="block">
+                            <context behavior="subtree" fold-type="enum" />
+                        </symbol>
+                        <starts-with>
+                            <expression>\{</expression>
+                            <capture number="0" name="zig.bracket" />
+                        </starts-with>
+                        <ends-with>
+                            <expression>\}</expression>
+                            <capture number="0" name="zig.bracket" />
+                        </ends-with>
+                        <subscopes>
+                            <include syntax="self" collection="comments" />
+                            <include syntax="self" collection="methods" />
+                            <include syntax="self" collection="containers" />
+                            <include syntax="self" collection="properties" />
+                        </subscopes>
+                    </scope>
+                </subscopes>
+            </scope>
         </collection>
         
         <collection name="properties">
